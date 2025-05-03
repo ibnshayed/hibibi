@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habibi | Women's Fashion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ff2d75",
+              secondary: "#ff8fab",
+              light: "#ffc2d1",
+              dark: "#d81159",
+              accent: "#ff7096",
+            },
+            fontFamily: {
+              sans: ['"Playfair Display"', "serif"],
+              body: ['"Montserrat"', "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+
+      /* Scroll indicator */
+      .scroll-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff2d75, #ff8fab);
+        z-index: 1000;
+        transition: width 0.1s;
+      }
+
+      /* Custom animations */
+      .hover-scale {
+        transition: transform 0.3s ease;
+      }
+      .hover-scale:hover {
+        transform: scale(1.05);
+      }
+
+      .hover-underline {
+        position: relative;
+      }
+      .hover-underline::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #ff2d75;
+        transition: width 0.3s ease;
+      }
+      .hover-underline:hover::after {
+        width: 100%;
+      }
+
+      /* Hero slider */
+      .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1s ease, transform 1.2s ease;
+        transform: scale(1.1);
+      }
+      .hero-slide.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* Review slider */
+      .review-slide {
+        position: absolute;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      .review-slide.active {
+        opacity: 1;
+      }
+
+      /* Product modal */
+      .modal-slide {
+        position: absolute;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      .modal-slide.active {
+        opacity: 1;
+      }
+
+      /* Slider dots */
+      .slider-dot {
+        transition: all 0.3s ease;
+      }
+      .slider-dot.active {
+        background-color: #ff2d75;
+        transform: scale(1.2);
+      }
+    </style>
+  </head>
+  <body class="bg-pink-50 font-body text-gray-800">
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
+    <!-- Header -->
+    <header
+      class="fixed top-0 left-0 w-full bg-white bg-opacity-90 backdrop-blur-md shadow-md z-50 transition-all duration-300"
+    >
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <a href="#" class="text-3xl font-bold text-primary font-sans">
+          <span class="text-dark">Habibi</span>
+          <i class="fas fa-heart ml-1 text-accent"></i>
+        </a>
+
+        <nav class="hidden md:flex space-x-8">
+          <a
+            href="#home"
+            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
+            >Home</a
+          >
+          <a
+            href="#shop"
+            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
+            >Shop</a
+          >
+          <a
+            href="#collections"
+            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
+            >Collections</a
+          >
+          <a
+            href="#reviews"
+            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
+            >Reviews</a
+          >
+          <a
+            href="#contact"
+            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
+            >Contact</a
+          >
+        </nav>
+
+        <div class="hidden md:flex items-center space-x-6">
+          <a
+            href="#"
+            class="text-dark hover:text-primary transition-colors duration-300"
+          >
+            <i class="fas fa-search text-xl"></i>
+          </a>
+          <a
+            href="#"
+            class="text-dark hover:text-primary transition-colors duration-300 relative"
+          >
+            <i class="fas fa-heart text-xl"></i>
+            <span
+              class="absolute -top-2 -right-2 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
+              >3</span
+            >
+          </a>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button id="menu-toggle" class="md:hidden text-dark focus:outline-none">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 bg-white bg-opacity-95 z-40 flex flex-col items-center justify-center transition-all duration-300 transform -translate-x-full"
+    >
+      <button
+        id="menu-close"
+        class="absolute top-6 right-6 text-3xl text-dark focus:outline-none"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+
+      <nav class="flex flex-col items-center space-y-8">
+        <a
+          href="#home"
+          class="text-3xl font-medium text-dark hover:text-primary transition-colors duration-300"
+          >Home</a
+        >
+        <a
+          href="#shop"
+          class="text-3xl font-medium text-dark hover:text-primary transition-colors duration-300"
+          >Shop</a
+        >
+        <a
+          href="#collections"
+          class="text-3xl font-medium text-dark hover:text-primary transition-colors duration-300"
+          >Collections</a
+        >
+        <a
+          href="#reviews"
+          class="text-3xl font-medium text-dark hover:text-primary transition-colors duration-300"
+          >Reviews</a
+        >
+        <a
+          href="#contact"
+          class="text-3xl font-medium text-dark hover:text-primary transition-colors duration-300"
+          >Contact</a
+        >
+      </nav>
+
+      <div class="mt-12 flex space-x-6">
+        <a
+          href="#"
+          class="text-dark hover:text-primary transition-colors duration-300 text-2xl"
+        >
+          <i class="fas fa-search"></i>
+        </a>
+        <a
+          href="#"
+          class="text-dark hover:text-primary transition-colors duration-300 text-2xl relative"
+        >
+          <i class="fas fa-heart"></i>
+          <span
+            class="absolute -top-2 -right-2 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
+            >3</span
+          >
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="pt-32 pb-20 px-4 bg-gradient-to-r from-pink-100 to-pink-50 relative overflow-hidden h-screen"
+    >
+      <div class="hero-slider relative w-full h-full">
+        <!-- Slide 1 -->
+        <div
+          class="hero-slide active"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80');
+            background-size: cover;
+            background-position: center;
+          "
+        >
+          <div class="container mx-auto h-full flex items-center">
+            <div class="max-w-2xl">
+              <h1
+                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
+              >
+                New Collection 2023
+              </h1>
+              <p class="text-xl text-white mb-8">
+                Discover our exclusive women's fashion collection designed to
+                make you feel beautiful and confident every day.
+              </p>
+              <div class="flex space-x-4">
+                <a
+                  href="#shop"
+                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >Shop Now</a
+                >
+                <a
+                  href="#collections"
+                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
+                  >View All</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div
+          class="hero-slide"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+          "
+        >
+          <div class="container mx-auto h-full flex items-center">
+            <div class="max-w-2xl">
+              <h1
+                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
+              >
+                Summer Essentials
+              </h1>
+              <p class="text-xl text-white mb-8">
+                Lightweight fabrics and vibrant colors perfect for the warm
+                season.
+              </p>
+              <div class="flex space-x-4">
+                <a
+                  href="#shop"
+                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >Explore</a
+                >
+                <a
+                  href="#collections"
+                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
+                  >Best Sellers</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div
+          class="hero-slide"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('https://images.unsplash.com/photo-1554412933-514a83d2f3c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80');
+            background-size: cover;
+            background-position: center;
+          "
+        >
+          <div class="container mx-auto h-full flex items-center">
+            <div class="max-w-2xl">
+              <h1
+                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
+              >
+                Limited Edition
+              </h1>
+              <p class="text-xl text-white mb-8">
+                Exclusive designs available for a limited time only.
+              </p>
+              <div class="flex space-x-4">
+                <a
+                  href="#shop"
+                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >View Collection</a
+                >
+                <a
+                  href="#reviews"
+                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
+                  >See Reviews</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-8 left-0 right-0 flex justify-center space-x-2 z-10"
+      >
+        <button
+          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300 active"
+        ></button>
+        <button
+          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300"
+        ></button>
+        <button
+          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300"
+        ></button>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="collections" class="py-16 px-4 bg-white">
+      <div class="container mx-auto">
+        <h2 class="text-4xl font-bold font-sans text-center text-dark mb-4">
+          Our Collections
+        </h2>
+        <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">
+          Explore our carefully curated collections designed for every occasion
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Category 1 -->
+          <div
+            class="relative overflow-hidden rounded-xl shadow-lg group h-96 hover-scale"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80"
+              alt="Dresses"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6"
+            >
+              <h3 class="text-2xl font-bold text-white mb-2">Dresses</h3>
+              <a
+                href="#"
+                class="text-white font-medium flex items-center group"
+              >
+                Shop Now
+                <i
+                  class="fas fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
+                ></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Category 2 -->
+          <div
+            class="relative overflow-hidden rounded-xl shadow-lg group h-96 hover-scale"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80"
+              alt="Tops"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6"
+            >
+              <h3 class="text-2xl font-bold text-white mb-2">Tops & Blouses</h3>
+              <a
+                href="#"
+                class="text-white font-medium flex items-center group"
+              >
+                Shop Now
+                <i
+                  class="fas fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
+                ></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Category 3 -->
+          <div
+            class="relative overflow-hidden rounded-xl shadow-lg group h-96 hover-scale"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80"
+              alt="Accessories"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6"
+            >
+              <h3 class="text-2xl font-bold text-white mb-2">Accessories</h3>
+              <a
+                href="#"
+                class="text-white font-medium flex items-center group"
+              >
+                Shop Now
+                <i
+                  class="fas fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
+                ></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="shop" class="py-16 px-4 bg-pink-50">
+      <div class="container mx-auto">
+        <div class="flex justify-between items-center mb-12">
+          <h2 class="text-4xl font-bold font-sans text-dark">
+            Featured Products
+          </h2>
+          <a href="#" class="text-primary font-medium flex items-center group">
+            View All
+            <i
+              class="fas fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"
+            ></i>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Product 1 -->
+          <div
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+          >
+            <div class="relative overflow-hidden h-80">
+              <!-- Product image slider -->
+              <div class="product-slider relative h-full">
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-100"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1854&q=80"
+                    alt="Floral Summer Dress"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80"
+                    alt="Floral Summer Dress Back"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80"
+                    alt="Floral Summer Dress Detail"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+
+                <!-- Slider dots -->
+                <div
+                  class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
+                >
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer active"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                </div>
+
+                <!-- Badge -->
+                <span
+                  class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full"
+                  >New</span
+                >
+
+                <!-- Quick actions -->
+                <div
+                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
+                >
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-bold text-lg text-dark mb-1">
+                    Floral Summer Dress
+                  </h3>
+                  <p class="text-sm text-gray-500 mb-2">Dresses</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-primary">$59.99</p>
+                  <p class="text-xs text-gray-400 line-through">$79.99</p>
+                </div>
+              </div>
+
+              <div class="flex items-center mt-3 mb-4">
+                <div class="flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <span class="text-xs text-gray-500 ml-2">(24)</span>
+              </div>
+
+              <div class="flex space-x-3">
+                <a
+                  href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Floral%20Summer%20Dress"
+                  class="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                </a>
+                <a
+                  href="https://m.me/yourpage"
+                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-facebook-messenger mr-2"></i> Messenger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product 2 -->
+          <div
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+          >
+            <div class="relative overflow-hidden h-80">
+              <!-- Product image slider -->
+              <div class="product-slider relative h-full">
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-100"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1864&q=80"
+                    alt="Silk Blouse"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80"
+                    alt="Silk Blouse Back"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80"
+                    alt="Silk Blouse Detail"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+
+                <!-- Slider dots -->
+                <div
+                  class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
+                >
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer active"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                </div>
+
+                <!-- Badge -->
+                <span
+                  class="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full"
+                  >Sale</span
+                >
+
+                <!-- Quick actions -->
+                <div
+                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
+                >
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-bold text-lg text-dark mb-1">Silk Blouse</h3>
+                  <p class="text-sm text-gray-500 mb-2">Tops</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-primary">$39.99</p>
+                  <p class="text-xs text-gray-400 line-through">$49.99</p>
+                </div>
+              </div>
+
+              <div class="flex items-center mt-3 mb-4">
+                <div class="flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <span class="text-xs text-gray-500 ml-2">(42)</span>
+              </div>
+
+              <div class="flex space-x-3">
+                <a
+                  href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Silk%20Blouse"
+                  class="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                </a>
+                <a
+                  href="https://m.me/yourpage"
+                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-facebook-messenger mr-2"></i> Messenger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product 3 -->
+          <div
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+          >
+            <div class="relative overflow-hidden h-80">
+              <!-- Product image slider -->
+              <div class="product-slider relative h-full">
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-100"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80"
+                    alt="Denim Skirt"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1854&q=80"
+                    alt="Denim Skirt Back"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1864&q=80"
+                    alt="Denim Skirt Detail"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+
+                <!-- Slider dots -->
+                <div
+                  class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
+                >
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer active"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                </div>
+
+                <!-- Badge -->
+                <span
+                  class="absolute top-4 right-4 bg-yellow-400 text-dark text-xs font-bold px-3 py-1 rounded-full"
+                  >Limited</span
+                >
+
+                <!-- Quick actions -->
+                <div
+                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
+                >
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-bold text-lg text-dark mb-1">Denim Skirt</h3>
+                  <p class="text-sm text-gray-500 mb-2">Bottoms</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-primary">$49.99</p>
+                </div>
+              </div>
+
+              <div class="flex items-center mt-3 mb-4">
+                <div class="flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="far fa-star"></i>
+                </div>
+                <span class="text-xs text-gray-500 ml-2">(18)</span>
+              </div>
+
+              <div class="flex space-x-3">
+                <a
+                  href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Denim%20Skirt"
+                  class="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                </a>
+                <a
+                  href="https://m.me/yourpage"
+                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-facebook-messenger mr-2"></i> Messenger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product 4 -->
+          <div
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+          >
+            <div class="relative overflow-hidden h-80">
+              <!-- Product image slider -->
+              <div class="product-slider relative h-full">
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-100"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80"
+                    alt="Linen Pants"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80"
+                    alt="Linen Pants Back"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 flex transition-opacity duration-500 opacity-0"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80"
+                    alt="Linen Pants Detail"
+                    class="w-full h-full object-cover cursor-pointer product-image"
+                  />
+                </div>
+
+                <!-- Slider dots -->
+                <div
+                  class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
+                >
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer active"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                  <span
+                    class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
+                  ></span>
+                </div>
+
+                <!-- Quick actions -->
+                <div
+                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
+                >
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-bold text-lg text-dark mb-1">Linen Pants</h3>
+                  <p class="text-sm text-gray-500 mb-2">Bottoms</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-primary">$45.99</p>
+                </div>
+              </div>
+
+              <div class="flex items-center mt-3 mb-4">
+                <div class="flex text-yellow-400">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <span class="text-xs text-gray-500 ml-2">(36)</span>
+              </div>
+
+              <div class="flex space-x-3">
+                <a
+                  href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Linen%20Pants"
+                  class="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                </a>
+                <a
+                  href="https://m.me/yourpage"
+                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-full text-center transition-colors duration-300 flex items-center justify-center"
+                >
+                  <i class="fab fa-facebook-messenger mr-2"></i> Messenger
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Special Offer Banner -->
+    <section class="py-16 px-4 bg-gradient-to-r from-primary to-accent">
+      <div class="container mx-auto text-center text-white">
+        <h2 class="text-4xl font-bold font-sans mb-6">
+          Summer Sale - Up to 50% Off
+        </h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+          Limited time offer on selected items. Don't miss out on these amazing
+          deals!
+        </p>
+        <a
+          href="#shop"
+          class="inline-block bg-white text-primary font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
+          >Shop the Sale</a
+        >
+      </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-16 px-4 bg-white relative overflow-hidden">
+      <div class="container mx-auto">
+        <h2 class="text-4xl font-bold font-sans text-center text-dark mb-4">
+          What Our Customers Say
+        </h2>
+        <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">
+          Hear from our happy customers about their shopping experience
+        </p>
+
+        <div class="review-slider relative h-96">
+          <!-- Review 1 -->
+          <div class="review-slide active absolute w-full">
+            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
+              <div class="flex items-center mb-6">
+                <img
+                  src="https://randomuser.me/api/portraits/women/32.jpg"
+                  alt="Sarah J."
+                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                />
+                <div class="ml-4">
+                  <h4 class="font-bold text-dark">Sarah J.</h4>
+                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                </div>
+              </div>
+              <div class="flex text-yellow-400 mb-3">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <p class="text-gray-700 relative pl-6">
+                <span
+                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                  >"</span
+                >
+                The quality of the dresses exceeded my expectations! I've
+                received so many compliments. Will definitely shop here again.
+              </p>
+            </div>
+          </div>
+
+          <!-- Review 2 -->
+          <div class="review-slide absolute w-full">
+            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
+              <div class="flex items-center mb-6">
+                <img
+                  src="https://randomuser.me/api/portraits/women/44.jpg"
+                  alt="Emma R."
+                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                />
+                <div class="ml-4">
+                  <h4 class="font-bold text-dark">Emma R.</h4>
+                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                </div>
+              </div>
+              <div class="flex text-yellow-400 mb-3">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+              <p class="text-gray-700 relative pl-6">
+                <span
+                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                  >"</span
+                >
+                The ordering process was so easy and my items arrived faster
+                than expected. The customer service was excellent when I had a
+                question.
+              </p>
+            </div>
+          </div>
+
+          <!-- Review 3 -->
+          <div class="review-slide absolute w-full">
+            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
+              <div class="flex items-center mb-6">
+                <img
+                  src="https://randomuser.me/api/portraits/women/68.jpg"
+                  alt="Maya K."
+                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                />
+                <div class="ml-4">
+                  <h4 class="font-bold text-dark">Maya K.</h4>
+                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                </div>
+              </div>
+              <div class="flex text-yellow-400 mb-3">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <p class="text-gray-700 relative pl-6">
+                <span
+                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                  >"</span
+                >
+                I ordered three items and they're all perfect! The fabrics are
+                so comfortable and the sizing was accurate. Will definitely
+                order more!
+              </p>
+            </div>
+          </div>
+
+          <!-- Review 4 -->
+          <div class="review-slide absolute w-full">
+            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
+              <div class="flex items-center mb-6">
+                <img
+                  src="https://randomuser.me/api/portraits/women/76.jpg"
+                  alt="Olivia T."
+                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                />
+                <div class="ml-4">
+                  <h4 class="font-bold text-dark">Olivia T.</h4>
+                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                </div>
+              </div>
+              <div class="flex text-yellow-400 mb-3">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <p class="text-gray-700 relative pl-6">
+                <span
+                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                  >"</span
+                >
+                The return process was so easy when I needed to exchange for a
+                different size. The staff was very helpful and the replacement
+                arrived quickly.
+              </p>
+            </div>
+          </div>
+
+          <!-- Review 5 -->
+          <div class="review-slide absolute w-full">
+            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
+              <div class="flex items-center mb-6">
+                <img
+                  src="https://randomuser.me/api/portraits/women/85.jpg"
+                  alt="Sophia L."
+                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                />
+                <div class="ml-4">
+                  <h4 class="font-bold text-dark">Sophia L.</h4>
+                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                </div>
+              </div>
+              <div class="flex text-yellow-400 mb-3">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <p class="text-gray-700 relative pl-6">
+                <span
+                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                  >"</span
+                >
+                I love the unique designs that I can't find anywhere else. The
+                quality is excellent and the prices are reasonable for the
+                craftsmanship.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center mt-8 space-x-2">
+          <button
+            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300 active"
+          ></button>
+          <button
+            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
+          ></button>
+          <button
+            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
+          ></button>
+          <button
+            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
+          ></button>
+          <button
+            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
+          ></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-16 px-4 bg-pink-100">
+      <div class="container mx-auto max-w-4xl">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden hover-scale">
+          <div class="md:flex">
+            <div
+              class="md:w-1/2 bg-gradient-to-br from-primary to-accent p-12 text-white"
+            >
+              <h2 class="text-3xl font-bold font-sans mb-4">
+                Subscribe to Our Newsletter
+              </h2>
+              <p class="mb-6">
+                Get the latest updates on new products, exclusive offers, and
+                fashion tips.
+              </p>
+              <div class="flex space-x-4">
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors duration-300"
+                >
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors duration-300"
+                >
+                  <i class="fab fa-instagram"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors duration-300"
+                >
+                  <i class="fab fa-pinterest-p"></i>
+                </a>
+              </div>
+            </div>
+            <div class="md:w-1/2 p-12">
+              <form>
+                <div class="mb-6">
+                  <label
+                    for="email"
+                    class="block text-gray-700 font-medium mb-2"
+                    >Email Address</label
+                  >
+                  <input
+                    type="email"
+                    id="email"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="your@email.com"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-primary hover:bg-dark text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300"
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="contact" id="contact">
+      <div class="bg-dark text-white pt-16 pb-8 px-4">
+        <div class="container mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <h3 class="text-2xl font-bold font-sans mb-6">
+                <span class="text-primary">Habibi</span>
+                <i class="fas fa-heart ml-1 text-accent"></i>
+              </h3>
+              <p class="mb-6 text-pink-200">
+                Premium women's fashion for every occasion. Designed to make you
+                feel beautiful and confident.
+              </p>
+              <div class="flex space-x-4">
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-pink-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors duration-300"
+                >
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-pink-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors duration-300"
+                >
+                  <i class="fab fa-instagram"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 bg-pink-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors duration-300"
+                >
+                  <i class="fab fa-pinterest-p"></i>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h4
+                class="font-bold text-lg mb-6 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-primary"
+              >
+                Quick Links
+              </h4>
+              <ul class="space-y-3">
+                <li>
+                  <a
+                    href="#home"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Home</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#shop"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Shop</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#collections"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Collections</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#reviews"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Reviews</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#contact"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Contact</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4
+                class="font-bold text-lg mb-6 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-primary"
+              >
+                Customer Service
+              </h4>
+              <ul class="space-y-3">
+                <li>
+                  <a
+                    href="#"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >FAQs</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Shipping Policy</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Returns & Exchanges</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Size Guide</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-pink-200 hover:text-primary transition-colors duration-300 hover-underline"
+                    >Track Order</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4
+                class="font-bold text-lg mb-6 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-primary"
+              >
+                Contact Us
+              </h4>
+              <ul class="space-y-3 text-pink-200">
+                <li class="flex items-start">
+                  <i class="fas fa-map-marker-alt mt-1 mr-3 text-primary"></i>
+                  <span>123 Fashion Street, New York, NY 10001</span>
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-phone-alt mr-3 text-primary"></i>
+                  <span>+1 (555) 123-4567</span>
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-envelope mr-3 text-primary"></i>
+                  <span>info@habibifashion.com</span>
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-clock mr-3 text-primary"></i>
+                  <span>Mon-Fri: 9AM - 6PM</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="border-t border-pink-800 pt-8 flex flex-col md:flex-row justify-between items-center"
+          >
+            <p class="text-pink-300 mb-4 md:mb-0">
+              © 2023 Habibi. All rights reserved.
+            </p>
+            <div class="flex space-x-6">
+              <a
+                href="#"
+                class="text-pink-300 hover:text-primary transition-colors duration-300 hover-underline"
+                >Privacy Policy</a
+              >
+              <a
+                href="#"
+                class="text-pink-300 hover:text-primary transition-colors duration-300 hover-underline"
+                >Terms of Service</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Product Image Modal -->
+    <div
+      id="product-modal"
+      class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center hidden"
+    >
+      <div class="relative max-w-4xl w-full p-4">
+        <button
+          id="modal-close"
+          class="absolute top-6 right-6 text-white text-3xl z-10 focus:outline-none"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-slider relative w-full h-96 md:h-[500px]">
+          <!-- Slides will be added dynamically -->
+        </div>
+
+        <div
+          class="modal-thumbnails flex justify-center space-x-2 mt-4 overflow-x-auto py-2"
+        >
+          <!-- Thumbnails will be added dynamically -->
+        </div>
+
+        <div class="flex justify-between items-center mt-6">
+          <button
+            id="modal-prev"
+            class="text-white hover:text-primary transition-colors duration-300 text-2xl"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            id="modal-next"
+            class="text-white hover:text-primary transition-colors duration-300 text-2xl"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Mobile Menu Toggle
+      const menuToggle = document.getElementById("menu-toggle");
+      const menuClose = document.getElementById("menu-close");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("-translate-x-full");
+        document.body.style.overflow = mobileMenu.classList.contains(
+          "-translate-x-full"
+        )
+          ? "auto"
+          : "hidden";
+      });
+
+      menuClose.addEventListener("click", () => {
+        mobileMenu.classList.add("-translate-x-full");
+        document.body.style.overflow = "auto";
+      });
+
+      // Close menu when clicking on a link
+      const menuLinks = document.querySelectorAll("#mobile-menu a");
+      menuLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileMenu.classList.add("-translate-x-full");
+          document.body.style.overflow = "auto";
+        });
+      });
+
+      // Hero Slider
+      const heroSlides = document.querySelectorAll(".hero-slide");
+      const heroDots = document.querySelectorAll(".hero-dot");
+      let currentHeroSlide = 0;
+      let heroInterval;
+
+      function showHeroSlide(n) {
+        heroSlides.forEach((slide) => slide.classList.remove("active"));
+        heroDots.forEach((dot) => dot.classList.remove("active"));
+
+        currentHeroSlide = (n + heroSlides.length) % heroSlides.length;
+        heroSlides[currentHeroSlide].classList.add("active");
+        heroDots[currentHeroSlide].classList.add("active");
+      }
+
+      function nextHeroSlide() {
+        showHeroSlide(currentHeroSlide + 1);
+      }
+
+      // Auto slide change every 5 seconds
+      heroInterval = setInterval(nextHeroSlide, 5000);
+
+      // Dot navigation
+      heroDots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          clearInterval(heroInterval);
+          showHeroSlide(index);
+          heroInterval = setInterval(nextHeroSlide, 5000);
+        });
+      });
+
+      // Review Slider
+      const reviewSlides = document.querySelectorAll(".review-slide");
+      const reviewDots = document.querySelectorAll(".review-dot");
+      let currentReviewSlide = 0;
+      let reviewInterval;
+
+      function showReviewSlide(n) {
+        reviewSlides.forEach((slide) => slide.classList.remove("active"));
+        reviewDots.forEach((dot) => dot.classList.remove("active"));
+
+        currentReviewSlide = (n + reviewSlides.length) % reviewSlides.length;
+        reviewSlides[currentReviewSlide].classList.add("active");
+        reviewDots[currentReviewSlide].classList.add("active");
+      }
+
+      function nextReviewSlide() {
+        showReviewSlide(currentReviewSlide + 1);
+      }
+
+      // Auto slide change every 6 seconds
+      reviewInterval = setInterval(nextReviewSlide, 6000);
+
+      // Dot navigation
+      reviewDots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          clearInterval(reviewInterval);
+          showReviewSlide(index);
+          reviewInterval = setInterval(nextReviewSlide, 6000);
+        });
+      });
+
+      // Product Image Sliders
+      const productSliders = document.querySelectorAll(".product-slider");
+
+      productSliders.forEach((slider) => {
+        const slides = slider.querySelectorAll("div");
+        const dots = slider.querySelectorAll(".slider-dot");
+        let currentSlide = 0;
+        let slideInterval;
+
+        function showSlide(n) {
+          slides.forEach((slide) => slide.classListList.remove("opacity-100"));
+          slides.forEach((slide) => slide.classList.add("opacity-0"));
+          dots.forEach((dot) => dot.classList.remove("active"));
+
+          currentSlide = (n + slides.length) % slides.length;
+          slides[currentSlide].classList.remove("opacity-0");
+          slides[currentSlide].classList.add("opacity-100");
+          dots[currentSlide].classList.add("active");
+        }
+
+        function nextSlide() {
+          showSlide(currentSlide + 1);
+        }
+
+        // Start auto-sliding
+        slideInterval = setInterval(nextSlide, 3000);
+
+        // Pause on hover
+        slider.addEventListener("mouseenter", () => {
+          clearInterval(slideInterval);
+        });
+
+        slider.addEventListener("mouseleave", () => {
+          slideInterval = setInterval(nextSlide, 3000);
+        });
+
+        // Dot navigation
+        dots.forEach((dot, index) => {
+          dot.addEventListener("click", (e) => {
+            e.stopPropagation();
+            clearInterval(slideInterval);
+            showSlide(index);
+            slideInterval = setInterval(nextSlide, 3000);
+          });
+        });
+      });
+
+      // Product Image Modal
+      const productModal = document.getElementById("product-modal");
+      const modalCloseBtn = document.getElementById("modal-close");
+      const modalSlider = document.querySelector(".modal-slider");
+      const modalThumbnails = document.querySelector(".modal-thumbnails");
+      const modalPrev = document.getElementById("modal-prev");
+      const modalNext = document.getElementById("modal-next");
+      let currentModalSlide = 0;
+      let productImages = [];
+
+      // Open modal when clicking on product images
+      document.querySelectorAll(".product-image").forEach((img) => {
+        img.addEventListener("click", function () {
+          const productCard = this.closest(".product-slider");
+          productImages = Array.from(
+            productCard.querySelectorAll(".product-image")
+          ).map((img) => ({
+            src: img.src,
+            alt: img.alt,
+          }));
+
+          openProductModal(0);
+        });
+      });
+
+      // Open modal when clicking quick view buttons
+      document.querySelectorAll(".quick-view-btn").forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          const productCard = this.closest(".product-slider");
+          productImages = Array.from(
+            productCard.querySelectorAll(".product-image")
+          ).map((img) => ({
+            src: img.src,
+            alt: img.alt,
+          }));
+
+          openProductModal(0);
+        });
+      });
+
+      function openProductModal(startIndex) {
+        currentModalSlide = startIndex;
+
+        // Clear previous content
+        modalSlider.innerHTML = "";
+        modalThumbnails.innerHTML = "";
+
+        // Add slides
+        productImages.forEach((img, index) => {
+          const slide = document.createElement("div");
+          slide.className = `modal-slide absolute inset-0 ${
+            index === startIndex ? "active" : ""
+          }`;
+          slide.innerHTML = `<img src="${img.src}" alt="${img.alt}" class="w-full h-full object-contain">`;
+          modalSlider.appendChild(slide);
+
+          // Add thumbnails
+          const thumbnail = document.createElement("img");
+          thumbnail.src = img.src;
+          thumbnail.alt = img.alt;
+          thumbnail.className = `w-16 h-16 object-cover rounded cursor-pointer border-2 ${
+            index === startIndex ? "border-primary" : "border-transparent"
+          }`;
+          thumbnail.addEventListener("click", () => showModalSlide(index));
+          modalThumbnails.appendChild(thumbnail);
+        });
+
+        // Show modal
+        productModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      }
+
+      function showModalSlide(n) {
+        const slides = document.querySelectorAll(".modal-slide");
+        const thumbnails = document.querySelectorAll(".modal-thumbnails img");
+
+        slides.forEach((slide) => slide.classList.remove("active"));
+        thumbnails.forEach((thumb) => thumb.classList.remove("border-primary"));
+
+        currentModalSlide = (n + productImages.length) % productImages.length;
+        slides[currentModalSlide].classList.add("active");
+        thumbnails[currentModalSlide].classList.add("border-primary");
+      }
+
+      // Modal navigation
+      modalPrev.addEventListener("click", () =>
+        showModalSlide(currentModalSlide - 1)
+      );
+      modalNext.addEventListener("click", () =>
+        showModalSlide(currentModalSlide + 1)
+      );
+
+      // Close modal
+      modalCloseBtn.addEventListener("click", () => {
+        productModal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+      });
+
+      // Close modal when clicking outside
+      productModal.addEventListener("click", (e) => {
+        if (e.target === productModal) {
+          productModal.classList.add("hidden");
+          document.body.style.overflow = "auto";
+        }
+      });
+
+      // Keyboard navigation for modal
+      document.addEventListener("keydown", (e) => {
+        if (!productModal.classList.contains("hidden")) {
+          if (e.key === "Escape") {
+            productModal.classList.add("hidden");
+            document.body.style.overflow = "auto";
+          } else if (e.key === "ArrowRight") {
+            showModalSlide(currentModalSlide + 1);
+          } else if (e.key === "ArrowLeft") {
+            showModalSlide(currentModalSlide - 1);
+          }
+        }
+      });
+
+      // Header effect on scroll
+      window.addEventListener("scroll", () => {
+        const header = document.querySelector("header");
+        if (window.scrollY > 50) {
+          header.classList.add("shadow-lg");
+          header.classList.add("py-2");
+        } else {
+          header.classList.remove("shadow-lg");
+          header.classList.remove("py-2");
+        }
+      });
+
+      // Scroll indicator
+      window.addEventListener("scroll", function () {
+        const scrollIndicator = document.getElementById("scrollIndicator");
+        const scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+        const scrollProgress = (scrollTop / scrollHeight) * 100;
+        scrollIndicator.style.width = scrollProgress + "%";
+      });
+
+      // Initialize Framer Motion animations
+      document.addEventListener("DOMContentLoaded", function () {
+        const animatedElements = document.querySelectorAll(
+          "[data-framer-animation]"
+        );
+
+        animatedElements.forEach((element) => {
+          const animationType = element.getAttribute("data-framer-animation");
+          const delay = element.getAttribute("data-framer-delay") || 0;
+
+          // Set initial styles
+          switch (animationType) {
+            case "fadeIn":
+              element.style.opacity = "0";
+              break;
+            case "fadeInUp":
+              element.style.opacity = "0";
+              element.style.transform = "translateY(20px)";
+              break;
+            case "fadeInDown":
+              element.style.opacity = "0";
+              element.style.transform = "translateY(-20px)";
+              break;
+            case "fadeInLeft":
+              element.style.opacity = "0";
+              element.style.transform = "translateX(-20px)";
+              break;
+            case "fadeInRight":
+              element.style.opacity = "0";
+              element.style.transform = "translateX(20px)";
+              break;
+          }
+
+          // Create intersection observer
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  setTimeout(() => {
+                    entry.target.style.transition =
+                      "opacity 0.6s ease, transform 0.6s ease";
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translate(0, 0)";
+                  }, delay * 1000);
+                }
+              });
+            },
+            { threshold: 0.1 }
+          );
+
+          observer.observe(element);
+        });
+      });
+    </script>
+  </body>
+</html>
