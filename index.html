@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html
+  lang="en"
+  x-data="{ openModal: false, currentProduct: null, quantity: 1 }"
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,6 +13,10 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
     <script>
       tailwind.config = {
         theme: {
@@ -31,7 +38,6 @@
     </script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
-
       /* Scroll indicator */
       .scroll-indicator {
         position: fixed;
@@ -42,15 +48,14 @@
         z-index: 1000;
         transition: width 0.1s;
       }
-
       /* Custom animations */
       .hover-scale {
+        transform: scale(1);
         transition: transform 0.3s ease;
       }
       .hover-scale:hover {
         transform: scale(1.05);
       }
-
       .hover-underline {
         position: relative;
       }
@@ -67,7 +72,6 @@
       .hover-underline:hover::after {
         width: 100%;
       }
-
       /* Hero slider */
       .hero-slide {
         position: absolute;
@@ -83,18 +87,19 @@
         opacity: 1;
         transform: scale(1);
       }
-
       /* Review slider */
       .review-slide {
         position: absolute;
         width: 100%;
         opacity: 0;
         transition: opacity 0.5s ease;
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
       }
       .review-slide.active {
         opacity: 1;
       }
-
       /* Product modal */
       .modal-slide {
         position: absolute;
@@ -104,7 +109,6 @@
       .modal-slide.active {
         opacity: 1;
       }
-
       /* Slider dots */
       .slider-dot {
         transition: all 0.3s ease;
@@ -113,78 +117,394 @@
         background-color: #ff2d75;
         transform: scale(1.2);
       }
+      /* Full page hero */
+      .full-page-hero {
+        height: 100vh;
+        position: relative;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 10;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      /* Chat buttons */
+      .chat-buttons {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .chat-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .chat-button:hover {
+        transform: scale(1.1);
+      }
+      .whatsapp-button {
+        background-color: #25d366;
+      }
+      .messenger-button {
+        background-color: #006aff;
+      }
+      .chat-button .tooltip {
+        position: absolute;
+        right: 70px;
+        background: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #333;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .chat-button:hover .tooltip {
+        opacity: 1;
+      }
+      /* Product modal */
+      .product-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .product-modal.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .product-modal-content {
+        background-color: white;
+        width: 90%;
+        max-width: 1200px;
+        max-height: 90vh;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .product-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .product-modal-body {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      @media (min-width: 1024px) {
+        .product-modal-body {
+          flex-direction: row;
+        }
+      }
+      .product-modal-images {
+        flex: 1;
+        position: relative;
+      }
+      .product-modal-main-image {
+        height: 500px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .product-modal-main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .product-modal-thumbnails {
+        display: flex;
+        gap: 10px;
+        padding: 15px;
+        overflow-x: auto;
+      }
+      .product-modal-thumbnail {
+        width: 70px;
+        height: 70px;
+        border-radius: 5px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+      }
+      .product-modal-thumbnail.active {
+        border-color: #ff2d75;
+      }
+      .product-modal-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .product-modal-details {
+        flex: 1;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+      }
+      .product-modal-options {
+        margin-top: 20px;
+      }
+      .size-options {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .size-option {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      .size-option.selected {
+        border-color: #ff2d75;
+        background-color: #ff2d75;
+        color: white;
+      }
+      .quantity-selector {
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+      }
+      .quantity-btn {
+        width: 40px;
+        height: 40px;
+        background-color: #f3f3f3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .quantity-input {
+        width: 60px;
+        height: 40px;
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+      /* Quick actions - always visible */
+      .quick-actions {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        opacity: 1;
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
+      .quick-action-btn {
+        width: 36px;
+        height: 36px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+      .quick-action-btn:hover {
+        color: #ff2d75;
+        transform: scale(1.1);
+      }
     </style>
   </head>
   <body class="bg-pink-50 font-body text-gray-800">
     <!-- Scroll Indicator -->
     <div class="scroll-indicator" id="scrollIndicator"></div>
-
-    <!-- Header -->
-    <header
-      class="fixed top-0 left-0 w-full bg-white bg-opacity-90 backdrop-blur-md shadow-md z-50 transition-all duration-300"
-    >
-      <div
-        class="container mx-auto px-4 py-4 flex justify-between items-center"
-      >
-        <a href="#" class="text-3xl font-bold text-primary font-sans">
-          <span class="text-dark">Habibi</span>
-          <i class="fas fa-heart ml-1 text-accent"></i>
-        </a>
-
-        <nav class="hidden md:flex space-x-8">
-          <a
-            href="#home"
-            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
-            >Home</a
-          >
-          <a
-            href="#shop"
-            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
-            >Shop</a
-          >
-          <a
-            href="#collections"
-            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
-            >Collections</a
-          >
-          <a
-            href="#reviews"
-            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
-            >Reviews</a
-          >
-          <a
-            href="#contact"
-            class="relative font-medium text-dark hover:text-primary transition-colors duration-300 hover-underline"
-            >Contact</a
-          >
-        </nav>
-
-        <div class="hidden md:flex items-center space-x-6">
-          <a
-            href="#"
-            class="text-dark hover:text-primary transition-colors duration-300"
-          >
-            <i class="fas fa-search text-xl"></i>
-          </a>
-          <a
-            href="#"
-            class="text-dark hover:text-primary transition-colors duration-300 relative"
-          >
-            <i class="fas fa-heart text-xl"></i>
-            <span
-              class="absolute -top-2 -right-2 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
-              >3</span
-            >
-          </a>
-        </div>
-
-        <!-- Mobile menu button -->
-        <button id="menu-toggle" class="md:hidden text-dark focus:outline-none">
-          <i class="fas fa-bars text-2xl"></i>
-        </button>
+    <!-- Full Page Hero Section -->
+    <section id="home" class="full-page-hero relative overflow-hidden">
+      <!-- Hero Slider Backgrounds -->
+      <div class="hero-slider absolute inset-0 w-full h-full">
+        <!-- Slide 1 -->
+        <div
+          class="hero-slide active"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80');
+            background-size: cover;
+            background-position: center;
+          "
+        ></div>
+        <!-- Slide 2 -->
+        <div
+          class="hero-slide"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+          "
+        ></div>
+        <!-- Slide 3 -->
+        <div
+          class="hero-slide"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('https://images.unsplash.com/photo-1554412933-514a83d2f3c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80');
+            background-size: cover;
+            background-position: center;
+          "
+        ></div>
       </div>
-    </header>
-
+      <!-- Hero Content (includes navigation and content) -->
+      <div class="hero-content bg-gradient-to-b from-black/30 to-transparent">
+        <!-- Header Inside Hero -->
+        <header
+          class="w-full bg-white/10 backdrop-blur-md shadow-md z-50 transition-all duration-300"
+        >
+          <div
+            class="container mx-auto px-4 py-4 flex justify-between items-center"
+          >
+            <a href="#" class="text-3xl font-bold text-white font-sans">
+              <span>Habibi</span>
+              <i class="fas fa-heart ml-1 text-accent"></i>
+            </a>
+            <nav class="hidden md:flex space-x-8">
+              <a
+                href="#home"
+                class="relative font-medium text-white hover:text-primary transition-colors duration-300 hover-underline"
+                >Home</a
+              >
+              <a
+                href="#shop"
+                class="relative font-medium text-white hover:text-primary transition-colors duration-300 hover-underline"
+                >Shop</a
+              >
+              <a
+                href="#collections"
+                class="relative font-medium text-white hover:text-primary transition-colors duration-300 hover-underline"
+                >Collections</a
+              >
+              <a
+                href="#reviews"
+                class="relative font-medium text-white hover:text-primary transition-colors duration-300 hover-underline"
+                >Reviews</a
+              >
+              <a
+                href="#contact"
+                class="relative font-medium text-white hover:text-primary transition-colors duration-300 hover-underline"
+                >Contact</a
+              >
+            </nav>
+            <div class="hidden md:flex items-center space-x-6">
+              <a
+                href="#"
+                class="text-white hover:text-primary transition-colors duration-300"
+              >
+                <i class="fas fa-search text-xl"></i>
+              </a>
+              <a
+                href="#"
+                class="text-white hover:text-primary transition-colors duration-300 relative"
+              >
+                <i class="fas fa-heart text-xl"></i>
+                <span
+                  class="absolute -top-2 -right-2 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
+                  >3</span
+                >
+              </a>
+            </div>
+            <!-- Mobile menu button -->
+            <button
+              id="menu-toggle"
+              class="md:hidden text-white focus:outline-none"
+            >
+              <i class="fas fa-bars text-2xl"></i>
+            </button>
+          </div>
+        </header>
+        <!-- Hero Main Content -->
+        <div class="flex-grow flex items-center">
+          <div class="container mx-auto px-4">
+            <div class="max-w-2xl">
+              <h1
+                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
+              >
+                New Collection 2023
+              </h1>
+              <p class="text-xl text-white mb-8">
+                Discover our exclusive women's fashion collection designed to
+                make you feel beautiful and confident every day.
+              </p>
+              <div class="flex space-x-4">
+                <a
+                  href="#shop"
+                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >Shop Now</a
+                >
+                <a
+                  href="#collections"
+                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
+                  >View All</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Hero Slider Dots -->
+      <div
+        class="absolute bottom-8 left-0 right-0 flex justify-center space-x-2 z-10"
+      >
+        <button
+          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300 active"
+        ></button>
+        <button
+          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300"
+        ></button>
+        <button
+          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300"
+        ></button>
+      </div>
+    </section>
     <!-- Mobile Menu -->
     <div
       id="mobile-menu"
@@ -196,7 +516,6 @@
       >
         <i class="fas fa-times"></i>
       </button>
-
       <nav class="flex flex-col items-center space-y-8">
         <a
           href="#home"
@@ -224,7 +543,6 @@
           >Contact</a
         >
       </nav>
-
       <div class="mt-12 flex space-x-6">
         <a
           href="#"
@@ -244,148 +562,6 @@
         </a>
       </div>
     </div>
-
-    <!-- Hero Section -->
-    <section
-      id="home"
-      class="pt-32 pb-20 px-4 bg-gradient-to-r from-pink-100 to-pink-50 relative overflow-hidden h-screen"
-    >
-      <div class="hero-slider relative w-full h-full">
-        <!-- Slide 1 -->
-        <div
-          class="hero-slide active"
-          style="
-            background-image: linear-gradient(
-                rgba(0, 0, 0, 0.3),
-                rgba(0, 0, 0, 0.3)
-              ),
-              url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80');
-            background-size: cover;
-            background-position: center;
-          "
-        >
-          <div class="container mx-auto h-full flex items-center">
-            <div class="max-w-2xl">
-              <h1
-                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
-              >
-                New Collection 2023
-              </h1>
-              <p class="text-xl text-white mb-8">
-                Discover our exclusive women's fashion collection designed to
-                make you feel beautiful and confident every day.
-              </p>
-              <div class="flex space-x-4">
-                <a
-                  href="#shop"
-                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >Shop Now</a
-                >
-                <a
-                  href="#collections"
-                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
-                  >View All</a
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 2 -->
-        <div
-          class="hero-slide"
-          style="
-            background-image: linear-gradient(
-                rgba(0, 0, 0, 0.3),
-                rgba(0, 0, 0, 0.3)
-              ),
-              url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-          "
-        >
-          <div class="container mx-auto h-full flex items-center">
-            <div class="max-w-2xl">
-              <h1
-                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
-              >
-                Summer Essentials
-              </h1>
-              <p class="text-xl text-white mb-8">
-                Lightweight fabrics and vibrant colors perfect for the warm
-                season.
-              </p>
-              <div class="flex space-x-4">
-                <a
-                  href="#shop"
-                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >Explore</a
-                >
-                <a
-                  href="#collections"
-                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
-                  >Best Sellers</a
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 3 -->
-        <div
-          class="hero-slide"
-          style="
-            background-image: linear-gradient(
-                rgba(0, 0, 0, 0.3),
-                rgba(0, 0, 0, 0.3)
-              ),
-              url('https://images.unsplash.com/photo-1554412933-514a83d2f3c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80');
-            background-size: cover;
-            background-position: center;
-          "
-        >
-          <div class="container mx-auto h-full flex items-center">
-            <div class="max-w-2xl">
-              <h1
-                class="text-5xl md:text-6xl font-bold font-sans text-white mb-6"
-              >
-                Limited Edition
-              </h1>
-              <p class="text-xl text-white mb-8">
-                Exclusive designs available for a limited time only.
-              </p>
-              <div class="flex space-x-4">
-                <a
-                  href="#shop"
-                  class="bg-primary hover:bg-dark text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >View Collection</a
-                >
-                <a
-                  href="#reviews"
-                  class="bg-white hover:bg-gray-100 text-primary font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
-                  >See Reviews</a
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="absolute bottom-8 left-0 right-0 flex justify-center space-x-2 z-10"
-      >
-        <button
-          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300 active"
-        ></button>
-        <button
-          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300"
-        ></button>
-        <button
-          class="hero-dot w-3 h-3 rounded-full bg-white bg-opacity-50 cursor-pointer transition-all duration-300"
-        ></button>
-      </div>
-    </section>
-
     <!-- Categories Section -->
     <section id="collections" class="py-16 px-4 bg-white">
       <div class="container mx-auto">
@@ -395,7 +571,6 @@
         <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">
           Explore our carefully curated collections designed for every occasion
         </p>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <!-- Category 1 -->
           <div
@@ -421,7 +596,6 @@
               </a>
             </div>
           </div>
-
           <!-- Category 2 -->
           <div
             class="relative overflow-hidden rounded-xl shadow-lg group h-96 hover-scale"
@@ -446,7 +620,6 @@
               </a>
             </div>
           </div>
-
           <!-- Category 3 -->
           <div
             class="relative overflow-hidden rounded-xl shadow-lg group h-96 hover-scale"
@@ -474,7 +647,6 @@
         </div>
       </div>
     </section>
-
     <!-- Featured Products -->
     <section id="shop" class="py-16 px-4 bg-pink-50">
       <div class="container mx-auto">
@@ -489,11 +661,28 @@
             ></i>
           </a>
         </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <!-- Product 1 -->
           <div
-            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale product-card"
+            x-data="{ currentImage: 0 }"
+            @click="openModal = true; currentProduct = {
+              id: 1,
+              title: 'Floral Summer Dress',
+              category: 'Dresses',
+              price: '$59.99',
+              oldPrice: '$79.99',
+              description: 'A beautiful floral summer dress made from lightweight, breathable fabric. Perfect for warm days and special occasions. Features a flattering A-line silhouette and adjustable straps.',
+              images: [
+                'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1854&q=80',
+                'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80',
+                'https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80'
+              ],
+              rating: 4.5,
+              reviewCount: 24,
+              colors: ['Pink', 'Red', 'Black', 'White'],
+              sizes: ['XS', 'S', 'M', 'L', 'XL']
+            }"
           >
             <div class="relative overflow-hidden h-80">
               <!-- Product image slider -->
@@ -525,7 +714,37 @@
                     class="w-full h-full object-cover cursor-pointer product-image"
                   />
                 </div>
-
+                <!-- Quick actions - always visible -->
+                <div class="quick-actions">
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="$event.preventDefault();"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="openModal = true; currentProduct = {
+                      id: 1,
+                      title: 'Floral Summer Dress',
+                      category: 'Dresses',
+                      price: '$59.99',
+                      oldPrice: '$79.99',
+                      description: 'A beautiful floral summer dress made from lightweight, breathable fabric. Perfect for warm days and special occasions. Features a flattering A-line silhouette and adjustable straps.',
+                      images: [
+                        'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1854&q=80',
+                        'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80',
+                        'https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80'
+                      ],
+                      rating: 4.5,
+                      reviewCount: 24,
+                      colors: ['Pink', 'Red', 'Black', 'White'],
+                      sizes: ['XS', 'S', 'M', 'L', 'XL']
+                    }"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
                 <!-- Slider dots -->
                 <div
                   class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
@@ -540,31 +759,13 @@
                     class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
                   ></span>
                 </div>
-
                 <!-- Badge -->
                 <span
                   class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full"
                   >New</span
                 >
-
-                <!-- Quick actions -->
-                <div
-                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
-                >
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
-                  >
-                    <i class="fas fa-heart"></i>
-                  </button>
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
               </div>
             </div>
-
             <div class="p-6">
               <div class="flex justify-between items-start">
                 <div>
@@ -578,7 +779,6 @@
                   <p class="text-xs text-gray-400 line-through">$79.99</p>
                 </div>
               </div>
-
               <div class="flex items-center mt-3 mb-4">
                 <div class="flex text-yellow-400">
                   <i class="fas fa-star"></i>
@@ -589,7 +789,6 @@
                 </div>
                 <span class="text-xs text-gray-500 ml-2">(24)</span>
               </div>
-
               <div class="flex space-x-3">
                 <a
                   href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Floral%20Summer%20Dress"
@@ -606,10 +805,27 @@
               </div>
             </div>
           </div>
-
           <!-- Product 2 -->
           <div
-            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale product-card"
+            x-data="{ currentImage: 0 }"
+            @click="openModal = true; currentProduct = {
+              id: 2,
+              title: 'Silk Blouse',
+              category: 'Tops',
+              price: '$39.99',
+              oldPrice: '$49.99',
+              description: 'Elegant silk blouse with a delicate drape. Features a classic collar and button-down front. Perfect for both professional and casual occasions.',
+              images: [
+                'https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1864&q=80',
+                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80',
+                'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80'
+              ],
+              rating: 5,
+              reviewCount: 42,
+              colors: ['White', 'Black', 'Blue'],
+              sizes: ['XS', 'S', 'M', 'L']
+            }"
           >
             <div class="relative overflow-hidden h-80">
               <!-- Product image slider -->
@@ -641,7 +857,37 @@
                     class="w-full h-full object-cover cursor-pointer product-image"
                   />
                 </div>
-
+                <!-- Quick actions - always visible -->
+                <div class="quick-actions">
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="$event.preventDefault();"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="openModal = true; currentProduct = {
+                      id: 2,
+                      title: 'Silk Blouse',
+                      category: 'Tops',
+                      price: '$39.99',
+                      oldPrice: '$49.99',
+                      description: 'Elegant silk blouse with a delicate drape. Features a classic collar and button-down front. Perfect for both professional and casual occasions.',
+                      images: [
+                        'https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1864&q=80',
+                        'https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80',
+                        'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80'
+                      ],
+                      rating: 5,
+                      reviewCount: 42,
+                      colors: ['White', 'Black', 'Blue'],
+                      sizes: ['XS', 'S', 'M', 'L']
+                    }"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
                 <!-- Slider dots -->
                 <div
                   class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
@@ -656,31 +902,13 @@
                     class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
                   ></span>
                 </div>
-
                 <!-- Badge -->
                 <span
                   class="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full"
                   >Sale</span
                 >
-
-                <!-- Quick actions -->
-                <div
-                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
-                >
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
-                  >
-                    <i class="fas fa-heart"></i>
-                  </button>
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
               </div>
             </div>
-
             <div class="p-6">
               <div class="flex justify-between items-start">
                 <div>
@@ -692,7 +920,6 @@
                   <p class="text-xs text-gray-400 line-through">$49.99</p>
                 </div>
               </div>
-
               <div class="flex items-center mt-3 mb-4">
                 <div class="flex text-yellow-400">
                   <i class="fas fa-star"></i>
@@ -703,7 +930,6 @@
                 </div>
                 <span class="text-xs text-gray-500 ml-2">(42)</span>
               </div>
-
               <div class="flex space-x-3">
                 <a
                   href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Silk%20Blouse"
@@ -720,10 +946,27 @@
               </div>
             </div>
           </div>
-
           <!-- Product 3 -->
           <div
-            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale product-card"
+            x-data="{ currentImage: 0 }"
+            @click="openModal = true; currentProduct = {
+              id: 3,
+              title: 'Denim Skirt',
+              category: 'Bottoms',
+              price: '$49.99',
+              oldPrice: '',
+              description: 'Classic denim skirt with a modern fit. Mid-rise waist and A-line silhouette. Features front pockets and a back zipper closure.',
+              images: [
+                'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80',
+                'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1854&q=80',
+                'https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1864&q=80'
+              ],
+              rating: 4,
+              reviewCount: 18,
+              colors: ['Blue', 'Black'],
+              sizes: ['S', 'M', 'L', 'XL']
+            }"
           >
             <div class="relative overflow-hidden h-80">
               <!-- Product image slider -->
@@ -755,7 +998,37 @@
                     class="w-full h-full object-cover cursor-pointer product-image"
                   />
                 </div>
-
+                <!-- Quick actions - always visible -->
+                <div class="quick-actions">
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="$event.preventDefault();"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="openModal = true; currentProduct = {
+                      id: 3,
+                      title: 'Denim Skirt',
+                      category: 'Bottoms',
+                      price: '$49.99',
+                      oldPrice: '',
+                      description: 'Classic denim skirt with a modern fit. Mid-rise waist and A-line silhouette. Features front pockets and a back zipper closure.',
+                      images: [
+                        'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80',
+                        'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1854&q=80',
+                        'https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1864&q=80'
+                      ],
+                      rating: 4,
+                      reviewCount: 18,
+                      colors: ['Blue', 'Black'],
+                      sizes: ['S', 'M', 'L', 'XL']
+                    }"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
                 <!-- Slider dots -->
                 <div
                   class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
@@ -770,31 +1043,13 @@
                     class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
                   ></span>
                 </div>
-
                 <!-- Badge -->
                 <span
                   class="absolute top-4 right-4 bg-yellow-400 text-dark text-xs font-bold px-3 py-1 rounded-full"
                   >Limited</span
                 >
-
-                <!-- Quick actions -->
-                <div
-                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
-                >
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
-                  >
-                    <i class="fas fa-heart"></i>
-                  </button>
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
               </div>
             </div>
-
             <div class="p-6">
               <div class="flex justify-between items-start">
                 <div>
@@ -805,7 +1060,6 @@
                   <p class="font-bold text-primary">$49.99</p>
                 </div>
               </div>
-
               <div class="flex items-center mt-3 mb-4">
                 <div class="flex text-yellow-400">
                   <i class="fas fa-star"></i>
@@ -816,7 +1070,6 @@
                 </div>
                 <span class="text-xs text-gray-500 ml-2">(18)</span>
               </div>
-
               <div class="flex space-x-3">
                 <a
                   href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Denim%20Skirt"
@@ -833,10 +1086,27 @@
               </div>
             </div>
           </div>
-
           <!-- Product 4 -->
           <div
-            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale"
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 hover-scale product-card"
+            x-data="{ currentImage: 0 }"
+            @click="openModal = true; currentProduct = {
+              id: 4,
+              title: 'Linen Pants',
+              category: 'Bottoms',
+              price: '$45.99',
+              oldPrice: '',
+              description: 'Comfortable linen pants with an elastic waistband. Loose fit for maximum comfort. Perfect for summer days and casual outings.',
+              images: [
+                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80',
+                'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80',
+                'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80'
+              ],
+              rating: 4.5,
+              reviewCount: 36,
+              colors: ['Beige', 'White', 'Black'],
+              sizes: ['XS', 'S', 'M', 'L']
+            }"
           >
             <div class="relative overflow-hidden h-80">
               <!-- Product image slider -->
@@ -868,7 +1138,37 @@
                     class="w-full h-full object-cover cursor-pointer product-image"
                   />
                 </div>
-
+                <!-- Quick actions - always visible -->
+                <div class="quick-actions">
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="$event.preventDefault();"
+                  >
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button
+                    class="quick-action-btn"
+                    @click.stop="openModal = true; currentProduct = {
+                      id: 4,
+                      title: 'Linen Pants',
+                      category: 'Bottoms',
+                      price: '$45.99',
+                      oldPrice: '',
+                      description: 'Comfortable linen pants with an elastic waistband. Loose fit for maximum comfort. Perfect for summer days and casual outings.',
+                      images: [
+                        'https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80',
+                        'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80',
+                        'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80'
+                      ],
+                      rating: 4.5,
+                      reviewCount: 36,
+                      colors: ['Beige', 'White', 'Black'],
+                      sizes: ['XS', 'S', 'M', 'L']
+                    }"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
                 <!-- Slider dots -->
                 <div
                   class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2"
@@ -883,25 +1183,8 @@
                     class="slider-dot w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
                   ></span>
                 </div>
-
-                <!-- Quick actions -->
-                <div
-                  class="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2"
-                >
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md"
-                  >
-                    <i class="fas fa-heart"></i>
-                  </button>
-                  <button
-                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-dark hover:text-primary shadow-md quick-view-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
               </div>
             </div>
-
             <div class="p-6">
               <div class="flex justify-between items-start">
                 <div>
@@ -912,7 +1195,6 @@
                   <p class="font-bold text-primary">$45.99</p>
                 </div>
               </div>
-
               <div class="flex items-center mt-3 mb-4">
                 <div class="flex text-yellow-400">
                   <i class="fas fa-star"></i>
@@ -923,7 +1205,6 @@
                 </div>
                 <span class="text-xs text-gray-500 ml-2">(36)</span>
               </div>
-
               <div class="flex space-x-3">
                 <a
                   href="https://wa.me/1234567890?text=I'm%20interested%20in%20the%20Linen%20Pants"
@@ -943,7 +1224,6 @@
         </div>
       </div>
     </section>
-
     <!-- Special Offer Banner -->
     <section class="py-16 px-4 bg-gradient-to-r from-primary to-accent">
       <div class="container mx-auto text-center text-white">
@@ -961,7 +1241,6 @@
         >
       </div>
     </section>
-
     <!-- Reviews Section -->
     <section id="reviews" class="py-16 px-4 bg-white relative overflow-hidden">
       <div class="container mx-auto">
@@ -971,173 +1250,214 @@
         <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">
           Hear from our happy customers about their shopping experience
         </p>
-
-        <div class="review-slider relative h-96">
-          <!-- Review 1 -->
+        <div class="review-slider relative h-auto min-h-[400px]">
+          <!-- Review Pair 1 -->
           <div class="review-slide active absolute w-full">
-            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
-              <div class="flex items-center mb-6">
-                <img
-                  src="https://randomuser.me/api/portraits/women/32.jpg"
-                  alt="Sarah J."
-                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
-                />
-                <div class="ml-4">
-                  <h4 class="font-bold text-dark">Sarah J.</h4>
-                  <p class="text-sm text-gray-500">Verified Buyer</p>
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+              <!-- Review 1 -->
+              <div
+                class="bg-pink-50 rounded-xl p-8 shadow-md w-full md:w-1/2 max-w-md"
+              >
+                <div class="flex items-center mb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/32.jpg"
+                    alt="Sarah J."
+                    class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                  />
+                  <div class="ml-4">
+                    <h4 class="font-bold text-dark">Sarah J.</h4>
+                    <p class="text-sm text-gray-500">Verified Buyer</p>
+                  </div>
                 </div>
+                <div class="flex text-yellow-400 mb-3">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <p class="text-gray-700 relative pl-6">
+                  <span
+                    class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                    >"</span
+                  >
+                  The quality of the dresses exceeded my expectations! I've
+                  received so many compliments. Will definitely shop here again.
+                </p>
               </div>
-              <div class="flex text-yellow-400 mb-3">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
+              <!-- Review 2 -->
+              <div
+                class="bg-pink-50 rounded-xl p-8 shadow-md w-full md:w-1/2 max-w-md"
+              >
+                <div class="flex items-center mb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/44.jpg"
+                    alt="Emma R."
+                    class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                  />
+                  <div class="ml-4">
+                    <h4 class="font-bold text-dark">Emma R.</h4>
+                    <p class="text-sm text-gray-500">Verified Buyer</p>
+                  </div>
+                </div>
+                <div class="flex text-yellow-400 mb-3">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="text-gray-700 relative pl-6">
+                  <span
+                    class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                    >"</span
+                  >
+                  The ordering process was so easy and my items arrived faster
+                  than expected. The customer service was excellent when I had a
+                  question.
+                </p>
               </div>
-              <p class="text-gray-700 relative pl-6">
-                <span
-                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
-                  >"</span
-                >
-                The quality of the dresses exceeded my expectations! I've
-                received so many compliments. Will definitely shop here again.
-              </p>
             </div>
           </div>
-
-          <!-- Review 2 -->
+          <!-- Review Pair 2 -->
           <div class="review-slide absolute w-full">
-            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
-              <div class="flex items-center mb-6">
-                <img
-                  src="https://randomuser.me/api/portraits/women/44.jpg"
-                  alt="Emma R."
-                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
-                />
-                <div class="ml-4">
-                  <h4 class="font-bold text-dark">Emma R.</h4>
-                  <p class="text-sm text-gray-500">Verified Buyer</p>
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+              <!-- Review 3 -->
+              <div
+                class="bg-pink-50 rounded-xl p-8 shadow-md w-full md:w-1/2 max-w-md"
+              >
+                <div class="flex items-center mb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/68.jpg"
+                    alt="Maya K."
+                    class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                  />
+                  <div class="ml-4">
+                    <h4 class="font-bold text-dark">Maya K.</h4>
+                    <p class="text-sm text-gray-500">Verified Buyer</p>
+                  </div>
                 </div>
+                <div class="flex text-yellow-400 mb-3">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <p class="text-gray-700 relative pl-6">
+                  <span
+                    class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                    >"</span
+                  >
+                  I ordered three items and they're all perfect! The fabrics are
+                  so comfortable and the sizing was accurate. Will definitely
+                  order more!
+                </p>
               </div>
-              <div class="flex text-yellow-400 mb-3">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star-half-alt"></i>
+              <!-- Review 4 -->
+              <div
+                class="bg-pink-50 rounded-xl p-8 shadow-md w-full md:w-1/2 max-w-md"
+              >
+                <div class="flex items-center mb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/76.jpg"
+                    alt="Olivia T."
+                    class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                  />
+                  <div class="ml-4">
+                    <h4 class="font-bold text-dark">Olivia T.</h4>
+                    <p class="text-sm text-gray-500">Verified Buyer</p>
+                  </div>
+                </div>
+                <div class="flex text-yellow-400 mb-3">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="far fa-star"></i>
+                </div>
+                <p class="text-gray-700 relative pl-6">
+                  <span
+                    class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                    >"</span
+                  >
+                  The return process was so easy when I needed to exchange for a
+                  different size. The staff was very helpful and the replacement
+                  arrived quickly.
+                </p>
               </div>
-              <p class="text-gray-700 relative pl-6">
-                <span
-                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
-                  >"</span
-                >
-                The ordering process was so easy and my items arrived faster
-                than expected. The customer service was excellent when I had a
-                question.
-              </p>
             </div>
           </div>
-
-          <!-- Review 3 -->
+          <!-- Review Pair 3 -->
           <div class="review-slide absolute w-full">
-            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
-              <div class="flex items-center mb-6">
-                <img
-                  src="https://randomuser.me/api/portraits/women/68.jpg"
-                  alt="Maya K."
-                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
-                />
-                <div class="ml-4">
-                  <h4 class="font-bold text-dark">Maya K.</h4>
-                  <p class="text-sm text-gray-500">Verified Buyer</p>
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+              <!-- Review 5 -->
+              <div
+                class="bg-pink-50 rounded-xl p-8 shadow-md w-full md:w-1/2 max-w-md"
+              >
+                <div class="flex items-center mb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/85.jpg"
+                    alt="Sophia L."
+                    class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                  />
+                  <div class="ml-4">
+                    <h4 class="font-bold text-dark">Sophia L.</h4>
+                    <p class="text-sm text-gray-500">Verified Buyer</p>
+                  </div>
                 </div>
-              </div>
-              <div class="flex text-yellow-400 mb-3">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-              </div>
-              <p class="text-gray-700 relative pl-6">
-                <span
-                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
-                  >"</span
-                >
-                I ordered three items and they're all perfect! The fabrics are
-                so comfortable and the sizing was accurate. Will definitely
-                order more!
-              </p>
-            </div>
-          </div>
-
-          <!-- Review 4 -->
-          <div class="review-slide absolute w-full">
-            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
-              <div class="flex items-center mb-6">
-                <img
-                  src="https://randomuser.me/api/portraits/women/76.jpg"
-                  alt="Olivia T."
-                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
-                />
-                <div class="ml-4">
-                  <h4 class="font-bold text-dark">Olivia T.</h4>
-                  <p class="text-sm text-gray-500">Verified Buyer</p>
+                <div class="flex text-yellow-400 mb-3">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
                 </div>
+                <p class="text-gray-700 relative pl-6">
+                  <span
+                    class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                    >"</span
+                  >
+                  I love the unique designs that I can't find anywhere else. The
+                  quality is excellent and the prices are reasonable for the
+                  craftsmanship.
+                </p>
               </div>
-              <div class="flex text-yellow-400 mb-3">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="far fa-star"></i>
-              </div>
-              <p class="text-gray-700 relative pl-6">
-                <span
-                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
-                  >"</span
-                >
-                The return process was so easy when I needed to exchange for a
-                different size. The staff was very helpful and the replacement
-                arrived quickly.
-              </p>
-            </div>
-          </div>
-
-          <!-- Review 5 -->
-          <div class="review-slide absolute w-full">
-            <div class="bg-pink-50 rounded-xl p-8 shadow-md max-w-3xl mx-auto">
-              <div class="flex items-center mb-6">
-                <img
-                  src="https://randomuser.me/api/portraits/women/85.jpg"
-                  alt="Sophia L."
-                  class="w-16 h-16 rounded-full object-cover border-4 border-primary"
-                />
-                <div class="ml-4">
-                  <h4 class="font-bold text-dark">Sophia L.</h4>
-                  <p class="text-sm text-gray-500">Verified Buyer</p>
+              <!-- Review 6 (added new review) -->
+              <div
+                class="bg-pink-50 rounded-xl p-8 shadow-md w-full md:w-1/2 max-w-md"
+              >
+                <div class="flex items-center mb-6">
+                  <img
+                    src="https://randomuser.me/api/portraits/women/12.jpg"
+                    alt="Ava M."
+                    class="w-16 h-16 rounded-full object-cover border-4 border-primary"
+                  />
+                  <div class="ml-4">
+                    <h4 class="font-bold text-dark">Ava M.</h4>
+                    <p class="text-sm text-gray-500">Verified Buyer</p>
+                  </div>
                 </div>
+                <div class="flex text-yellow-400 mb-3">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <p class="text-gray-700 relative pl-6">
+                  <span
+                    class="absolute left-0 top-0 text-4xl text-primary opacity-20"
+                    >"</span
+                  >
+                  The customer service is outstanding! They helped me choose the
+                  perfect size and the dress fits like a dream. Highly
+                  recommend!
+                </p>
               </div>
-              <div class="flex text-yellow-400 mb-3">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-              </div>
-              <p class="text-gray-700 relative pl-6">
-                <span
-                  class="absolute left-0 top-0 text-4xl text-primary opacity-20"
-                  >"</span
-                >
-                I love the unique designs that I can't find anywhere else. The
-                quality is excellent and the prices are reasonable for the
-                craftsmanship.
-              </p>
             </div>
           </div>
         </div>
-
         <div class="flex justify-center mt-8 space-x-2">
           <button
             class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300 active"
@@ -1148,16 +1468,9 @@
           <button
             class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
           ></button>
-          <button
-            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
-          ></button>
-          <button
-            class="review-dot w-3 h-3 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"
-          ></button>
         </div>
       </div>
     </section>
-
     <!-- Newsletter -->
     <section class="py-16 px-4 bg-pink-100">
       <div class="container mx-auto max-w-4xl">
@@ -1221,7 +1534,6 @@
         </div>
       </div>
     </section>
-
     <!-- Footer -->
     <footer class="contact" id="contact">
       <div class="bg-dark text-white pt-16 pb-8 px-4">
@@ -1257,7 +1569,6 @@
                 </a>
               </div>
             </div>
-
             <div>
               <h4
                 class="font-bold text-lg mb-6 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-primary"
@@ -1302,7 +1613,6 @@
                 </li>
               </ul>
             </div>
-
             <div>
               <h4
                 class="font-bold text-lg mb-6 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-primary"
@@ -1347,7 +1657,6 @@
                 </li>
               </ul>
             </div>
-
             <div>
               <h4
                 class="font-bold text-lg mb-6 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-primary"
@@ -1374,7 +1683,6 @@
               </ul>
             </div>
           </div>
-
           <div
             class="border-t border-pink-800 pt-8 flex flex-col md:flex-row justify-between items-center"
           >
@@ -1397,53 +1705,194 @@
         </div>
       </div>
     </footer>
-
-    <!-- Product Image Modal -->
+    <!-- Product Details Modal -->
     <div
-      id="product-modal"
-      class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center hidden"
+      class="product-modal"
+      :class="{ 'active': openModal }"
+      x-show="openModal"
+      x-transition
     >
-      <div class="relative max-w-4xl w-full p-4">
-        <button
-          id="modal-close"
-          class="absolute top-6 right-6 text-white text-3xl z-10 focus:outline-none"
-        >
+      <div class="product-modal-content">
+        <div class="product-modal-close" @click="openModal = false">
           <i class="fas fa-times"></i>
-        </button>
-
-        <div class="modal-slider relative w-full h-96 md:h-[500px]">
-          <!-- Slides will be added dynamically -->
         </div>
-
-        <div
-          class="modal-thumbnails flex justify-center space-x-2 mt-4 overflow-x-auto py-2"
-        >
-          <!-- Thumbnails will be added dynamically -->
-        </div>
-
-        <div class="flex justify-between items-center mt-6">
-          <button
-            id="modal-prev"
-            class="text-white hover:text-primary transition-colors duration-300 text-2xl"
-          >
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <button
-            id="modal-next"
-            class="text-white hover:text-primary transition-colors duration-300 text-2xl"
-          >
-            <i class="fas fa-chevron-right"></i>
-          </button>
+        <div class="product-modal-body">
+          <div class="product-modal-images">
+            <!-- Main image with fixed height -->
+            <div class="product-modal-main-image">
+              <img
+                :src="currentProduct?.images[0]"
+                :alt="currentProduct?.title"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="product-modal-thumbnails">
+              <!-- Thumbnails -->
+              <template
+                x-for="(image, index) in currentProduct?.images"
+                :key="index"
+              >
+                <div
+                  class="product-modal-thumbnail"
+                  :class="{ 'active': index === 0 }"
+                  @click="currentProduct.images = [image, ...currentProduct.images.filter(img => img !== image)]"
+                >
+                  <img
+                    :src="image"
+                    :alt="currentProduct.title"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="product-modal-details">
+            <h2
+              x-text="currentProduct?.title"
+              class="text-3xl font-bold font-sans text-dark mb-2"
+            ></h2>
+            <div class="flex items-center mb-4">
+              <div class="flex text-yellow-400">
+                <template x-for="i in 5">
+                  <i
+                    :class="{
+                      'fas fa-star': i <= Math.floor(currentProduct?.rating),
+                      'fas fa-star-half-alt': i === Math.ceil(currentProduct?.rating) && currentProduct?.rating % 1 > 0,
+                      'far fa-star': i > Math.ceil(currentProduct?.rating)
+                    }"
+                  ></i>
+                </template>
+              </div>
+              <span
+                class="text-sm text-gray-500 ml-2"
+                x-text="'(' + currentProduct?.reviewCount + ')'"
+              ></span>
+            </div>
+            <div class="flex items-center mb-4">
+              <p
+                x-text="currentProduct?.price"
+                class="text-2xl font-bold text-primary mr-4"
+              ></p>
+              <p
+                x-text="currentProduct?.oldPrice"
+                class="text-sm text-gray-400 line-through"
+                x-show="currentProduct?.oldPrice"
+              ></p>
+            </div>
+            <p
+              x-text="currentProduct?.description"
+              class="text-gray-700 mb-4"
+            ></p>
+            <div class="product-modal-options">
+              <h3 class="font-bold text-dark mb-2">Size</h3>
+              <div class="size-options">
+                <template x-for="size in currentProduct?.sizes" :key="size">
+                  <div
+                    class="size-option"
+                    :class="{ 'selected': size === 'S' }"
+                    x-text="size"
+                    @click="$event.target.parentElement.querySelector('.selected').classList.remove('selected'); $event.target.classList.add('selected')"
+                  ></div>
+                </template>
+              </div>
+              <h3 class="font-bold text-dark mb-2 mt-6">Color</h3>
+              <div class="color-options flex gap-3">
+                <template x-for="color in currentProduct?.colors" :key="color">
+                  <div
+                    class="color-option w-8 h-8 rounded-full cursor-pointer border-2"
+                    :class="{
+                      'selected': color === 'Pink',
+                      'border-transparent': color !== 'Pink'
+                    }"
+                    :style="{
+                      'background-color': color === 'Pink' ? '#ffc2d1' :
+                                        color === 'Red' ? '#d81159' :
+                                        color === 'Black' ? '#000' :
+                                        color === 'White' ? '#fff' :
+                                        color === 'Blue' ? '#006AFF' : '#f3f3f3',
+                      'border': color === 'White' ? '1px solid #ddd' : 'none'
+                    }"
+                    @click="$event.target.parentElement.querySelector('.selected').classList.remove('selected'); $event.target.classList.add('selected')"
+                  ></div>
+                </template>
+              </div>
+              <div class="quantity-selector mt-6">
+                <h3 class="font-bold text-dark mb-4">Quantity</h3>
+                <div class="flex items-center">
+                  <button
+                    class="quantity-btn"
+                    @click="if (quantity > 1) quantity--"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    x-model="quantity"
+                    min="1"
+                    class="quantity-input"
+                  />
+                  <button class="quantity-btn" @click="quantity++">+</button>
+                </div>
+              </div>
+              <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                <button
+                  class="bg-primary hover:bg-dark text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 flex-1"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  class="bg-white border border-primary text-primary font-bold py-3 px-8 rounded-full transition-colors duration-300 flex-1"
+                >
+                  Add to Wishlist
+                </button>
+              </div>
+              <div class="mt-6 pt-6 border-t border-gray-200">
+                <div class="flex items-center mb-2">
+                  <i class="fas fa-truck text-gray-500 mr-2"></i>
+                  <span class="text-sm text-gray-600"
+                    >Free shipping on orders over $50</span
+                  >
+                </div>
+                <div class="flex items-center mb-2">
+                  <i class="fas fa-undo text-gray-500 mr-2"></i>
+                  <span class="text-sm text-gray-600">Easy 30-day returns</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-shield-alt text-gray-500 mr-2"></i>
+                  <span class="text-sm text-gray-600">Secure checkout</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
+    <!-- WhatsApp and Messenger Chat Buttons -->
+    <div class="chat-buttons">
+      <!-- WhatsApp Button -->
+      <a
+        href="https://wa.me/1234567890"
+        target="_blank"
+        class="chat-button whatsapp-button"
+      >
+        <i class="fab fa-whatsapp"></i>
+        <span class="tooltip">Chat on WhatsApp</span>
+      </a>
+      <!-- Messenger Button -->
+      <a
+        href="https://m.me/yourpage"
+        target="_blank"
+        class="chat-button messenger-button"
+      >
+        <i class="fab fa-facebook-messenger"></i>
+        <span class="tooltip">Chat on Messenger</span>
+      </a>
+    </div>
     <script>
       // Mobile Menu Toggle
       const menuToggle = document.getElementById("menu-toggle");
       const menuClose = document.getElementById("menu-close");
       const mobileMenu = document.getElementById("mobile-menu");
-
       menuToggle.addEventListener("click", () => {
         mobileMenu.classList.toggle("-translate-x-full");
         document.body.style.overflow = mobileMenu.classList.contains(
@@ -1452,12 +1901,10 @@
           ? "auto"
           : "hidden";
       });
-
       menuClose.addEventListener("click", () => {
         mobileMenu.classList.add("-translate-x-full");
         document.body.style.overflow = "auto";
       });
-
       // Close menu when clicking on a link
       const menuLinks = document.querySelectorAll("#mobile-menu a");
       menuLinks.forEach((link) => {
@@ -1466,29 +1913,23 @@
           document.body.style.overflow = "auto";
         });
       });
-
       // Hero Slider
       const heroSlides = document.querySelectorAll(".hero-slide");
       const heroDots = document.querySelectorAll(".hero-dot");
       let currentHeroSlide = 0;
       let heroInterval;
-
       function showHeroSlide(n) {
         heroSlides.forEach((slide) => slide.classList.remove("active"));
         heroDots.forEach((dot) => dot.classList.remove("active"));
-
         currentHeroSlide = (n + heroSlides.length) % heroSlides.length;
         heroSlides[currentHeroSlide].classList.add("active");
         heroDots[currentHeroSlide].classList.add("active");
       }
-
       function nextHeroSlide() {
         showHeroSlide(currentHeroSlide + 1);
       }
-
       // Auto slide change every 5 seconds
       heroInterval = setInterval(nextHeroSlide, 5000);
-
       // Dot navigation
       heroDots.forEach((dot, index) => {
         dot.addEventListener("click", () => {
@@ -1497,29 +1938,23 @@
           heroInterval = setInterval(nextHeroSlide, 5000);
         });
       });
-
       // Review Slider
       const reviewSlides = document.querySelectorAll(".review-slide");
       const reviewDots = document.querySelectorAll(".review-dot");
       let currentReviewSlide = 0;
       let reviewInterval;
-
       function showReviewSlide(n) {
         reviewSlides.forEach((slide) => slide.classList.remove("active"));
         reviewDots.forEach((dot) => dot.classList.remove("active"));
-
         currentReviewSlide = (n + reviewSlides.length) % reviewSlides.length;
         reviewSlides[currentReviewSlide].classList.add("active");
         reviewDots[currentReviewSlide].classList.add("active");
       }
-
       function nextReviewSlide() {
         showReviewSlide(currentReviewSlide + 1);
       }
-
       // Auto slide change every 6 seconds
       reviewInterval = setInterval(nextReviewSlide, 6000);
-
       // Dot navigation
       reviewDots.forEach((dot, index) => {
         dot.addEventListener("click", () => {
@@ -1528,43 +1963,34 @@
           reviewInterval = setInterval(nextReviewSlide, 6000);
         });
       });
-
       // Product Image Sliders
       const productSliders = document.querySelectorAll(".product-slider");
-
       productSliders.forEach((slider) => {
         const slides = slider.querySelectorAll("div");
         const dots = slider.querySelectorAll(".slider-dot");
         let currentSlide = 0;
         let slideInterval;
-
         function showSlide(n) {
-          slides.forEach((slide) => slide.classListList.remove("opacity-100"));
+          slides.forEach((slide) => slide.classList.remove("opacity-100"));
           slides.forEach((slide) => slide.classList.add("opacity-0"));
           dots.forEach((dot) => dot.classList.remove("active"));
-
           currentSlide = (n + slides.length) % slides.length;
           slides[currentSlide].classList.remove("opacity-0");
           slides[currentSlide].classList.add("opacity-100");
           dots[currentSlide].classList.add("active");
         }
-
         function nextSlide() {
           showSlide(currentSlide + 1);
         }
-
         // Start auto-sliding
         slideInterval = setInterval(nextSlide, 3000);
-
         // Pause on hover
         slider.addEventListener("mouseenter", () => {
           clearInterval(slideInterval);
         });
-
         slider.addEventListener("mouseleave", () => {
           slideInterval = setInterval(nextSlide, 3000);
         });
-
         // Dot navigation
         dots.forEach((dot, index) => {
           dot.addEventListener("click", (e) => {
@@ -1575,128 +2001,6 @@
           });
         });
       });
-
-      // Product Image Modal
-      const productModal = document.getElementById("product-modal");
-      const modalCloseBtn = document.getElementById("modal-close");
-      const modalSlider = document.querySelector(".modal-slider");
-      const modalThumbnails = document.querySelector(".modal-thumbnails");
-      const modalPrev = document.getElementById("modal-prev");
-      const modalNext = document.getElementById("modal-next");
-      let currentModalSlide = 0;
-      let productImages = [];
-
-      // Open modal when clicking on product images
-      document.querySelectorAll(".product-image").forEach((img) => {
-        img.addEventListener("click", function () {
-          const productCard = this.closest(".product-slider");
-          productImages = Array.from(
-            productCard.querySelectorAll(".product-image")
-          ).map((img) => ({
-            src: img.src,
-            alt: img.alt,
-          }));
-
-          openProductModal(0);
-        });
-      });
-
-      // Open modal when clicking quick view buttons
-      document.querySelectorAll(".quick-view-btn").forEach((btn) => {
-        btn.addEventListener("click", function (e) {
-          e.preventDefault();
-          const productCard = this.closest(".product-slider");
-          productImages = Array.from(
-            productCard.querySelectorAll(".product-image")
-          ).map((img) => ({
-            src: img.src,
-            alt: img.alt,
-          }));
-
-          openProductModal(0);
-        });
-      });
-
-      function openProductModal(startIndex) {
-        currentModalSlide = startIndex;
-
-        // Clear previous content
-        modalSlider.innerHTML = "";
-        modalThumbnails.innerHTML = "";
-
-        // Add slides
-        productImages.forEach((img, index) => {
-          const slide = document.createElement("div");
-          slide.className = `modal-slide absolute inset-0 ${
-            index === startIndex ? "active" : ""
-          }`;
-          slide.innerHTML = `<img src="${img.src}" alt="${img.alt}" class="w-full h-full object-contain">`;
-          modalSlider.appendChild(slide);
-
-          // Add thumbnails
-          const thumbnail = document.createElement("img");
-          thumbnail.src = img.src;
-          thumbnail.alt = img.alt;
-          thumbnail.className = `w-16 h-16 object-cover rounded cursor-pointer border-2 ${
-            index === startIndex ? "border-primary" : "border-transparent"
-          }`;
-          thumbnail.addEventListener("click", () => showModalSlide(index));
-          modalThumbnails.appendChild(thumbnail);
-        });
-
-        // Show modal
-        productModal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-      }
-
-      function showModalSlide(n) {
-        const slides = document.querySelectorAll(".modal-slide");
-        const thumbnails = document.querySelectorAll(".modal-thumbnails img");
-
-        slides.forEach((slide) => slide.classList.remove("active"));
-        thumbnails.forEach((thumb) => thumb.classList.remove("border-primary"));
-
-        currentModalSlide = (n + productImages.length) % productImages.length;
-        slides[currentModalSlide].classList.add("active");
-        thumbnails[currentModalSlide].classList.add("border-primary");
-      }
-
-      // Modal navigation
-      modalPrev.addEventListener("click", () =>
-        showModalSlide(currentModalSlide - 1)
-      );
-      modalNext.addEventListener("click", () =>
-        showModalSlide(currentModalSlide + 1)
-      );
-
-      // Close modal
-      modalCloseBtn.addEventListener("click", () => {
-        productModal.classList.add("hidden");
-        document.body.style.overflow = "auto";
-      });
-
-      // Close modal when clicking outside
-      productModal.addEventListener("click", (e) => {
-        if (e.target === productModal) {
-          productModal.classList.add("hidden");
-          document.body.style.overflow = "auto";
-        }
-      });
-
-      // Keyboard navigation for modal
-      document.addEventListener("keydown", (e) => {
-        if (!productModal.classList.contains("hidden")) {
-          if (e.key === "Escape") {
-            productModal.classList.add("hidden");
-            document.body.style.overflow = "auto";
-          } else if (e.key === "ArrowRight") {
-            showModalSlide(currentModalSlide + 1);
-          } else if (e.key === "ArrowLeft") {
-            showModalSlide(currentModalSlide - 1);
-          }
-        }
-      });
-
       // Header effect on scroll
       window.addEventListener("scroll", () => {
         const header = document.querySelector("header");
@@ -1708,7 +2012,6 @@
           header.classList.remove("py-2");
         }
       });
-
       // Scroll indicator
       window.addEventListener("scroll", function () {
         const scrollIndicator = document.getElementById("scrollIndicator");
@@ -1720,17 +2023,14 @@
         const scrollProgress = (scrollTop / scrollHeight) * 100;
         scrollIndicator.style.width = scrollProgress + "%";
       });
-
       // Initialize Framer Motion animations
       document.addEventListener("DOMContentLoaded", function () {
         const animatedElements = document.querySelectorAll(
           "[data-framer-animation]"
         );
-
         animatedElements.forEach((element) => {
           const animationType = element.getAttribute("data-framer-animation");
           const delay = element.getAttribute("data-framer-delay") || 0;
-
           // Set initial styles
           switch (animationType) {
             case "fadeIn":
@@ -1753,7 +2053,6 @@
               element.style.transform = "translateX(20px)";
               break;
           }
-
           // Create intersection observer
           const observer = new IntersectionObserver(
             (entries) => {
@@ -1770,7 +2069,6 @@
             },
             { threshold: 0.1 }
           );
-
           observer.observe(element);
         });
       });
